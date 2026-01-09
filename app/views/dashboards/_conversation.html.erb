@@ -17,9 +17,38 @@
         <%= number_to_currency(conversation.potential_amount, unit: "$", precision: 0) %>
     </td>
     <td class="px-6 py-4 text-slate-600">
-        <%= conversation.raw_data.dig('analysis', 'summary') || "Pendiente de análisis..." %>
+        <% analysis = conversation.analysis %>
+        <% if analysis.present? && analysis['bot_audit'].present? %>
+            <div class="flex flex-col gap-1">
+                <div class="flex items-center gap-2">
+                    <% rating = analysis.dig('bot_audit', 'rating').to_i %>
+                    <% rating_color = rating >= 8 ? 'bg-green-100 text-green-700' : (rating >= 5 ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700') %>
+                    <span class="px-2 py-0.5 rounded text-xs font-bold <%= rating_color %>">
+                        Bot: <%= rating %>/10
+                    </span>
+                    
+                    <% temp = analysis.dig('client_metrics', 'temperature').to_i %>
+                    <% if temp >= 8 %>
+                        <span class="px-1.5 py-0.5 rounded text-xs bg-indigo-100 text-indigo-700 font-medium">🔥 Hot</span>
+                    <% end %>
+
+                    <% objections = analysis.dig('client_metrics', 'objections') %>
+                    <% if objections.present? && objections != ["Ninguna"] %>
+                         <span class="text-xs text-slate-500" title="<%= objections.join(', ') %>">
+                            ⚠️ <%= objections.size %> Objeción(es)
+                         </span>
+                    <% end %>
+                </div>
+                
+                <p class="text-xs text-slate-600 line-clamp-2" title="<%= analysis.dig('bot_audit', 'feedback') %>">
+                    <%= analysis.dig('bot_audit', 'feedback') %>
+                </p>
+            </div>
+        <% else %>
+            <span class="text-slate-400 text-xs italic">Pendiente de análisis...</span>
+        <% end %>
     </td>
     <td class="px-6 py-4">
-        <a href="#" class="text-indigo-600 hover:text-indigo-900 font-medium">Ver Chat &rarr;</a>
+        <a href="https://chatwoot.grafica.xetro.com.ar/app/accounts/1/conversations/<%= conversation.external_id %>" target="_blank" class="text-indigo-600 hover:text-indigo-900 font-medium">Ver Chat &rarr;</a>
     </td>
 </tr>

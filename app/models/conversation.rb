@@ -1,4 +1,5 @@
 class Conversation < ApplicationRecord
+  include Turbo::Broadcastable
   enum :status, { open: 0, sold: 1, dropped: 2, bot_failure: 3 }, default: :open
 
   validates :external_id, presence: true, uniqueness: true

@@ -9,7 +9,10 @@ module Api
 
         if reviews.present?
           reviews.each do |review|
-            conversation = Conversation.find_by(id: review[:id])
+            # Try to find by external_id (Chatwoot ID) first, then internal ID
+            conversation = Conversation.find_by(external_id: review[:id]) || Conversation.find_by(id: review[:id])
+            
+            # If still not found, we might want to create it? For now, just skip.
             next unless conversation
 
             # Upsert/Update the analysis column

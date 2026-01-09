@@ -60,3 +60,6 @@ gem "chartkick"
 gem "groupdate"
 
 gem "config"
+gem "turbo-rails"
+
+gem "ruby-openai", "~> 8.3"

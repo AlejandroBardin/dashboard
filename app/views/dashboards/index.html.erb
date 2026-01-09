@@ -22,26 +22,81 @@
                 <i data-lucide="refresh-cw" class="w-4 h-4"></i>
                 Sync con IA
             <% end %>
+
+            <%= link_to bot_failures_path, class: "flex items-center gap-2 bg-red-100 hover:bg-red-200 text-red-700 px-4 py-2 rounded-lg font-medium transition-colors border border-red-200" do %>
+                <i data-lucide="skull" class="w-4 h-4"></i>
+                Hall of Shame
+            <% end %>
             
-            <div class="flex bg-white rounded-lg p-1 border border-slate-200 shadow-sm">
-                <%= link_to "Hoy", root_path(range: "today"), class: "px-4 py-2 text-sm font-medium rounded-md #{params[:range] == 'today' ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-50'}" %>
-                <%= link_to "Esta Semana", root_path(range: "this_week"), class: "px-4 py-2 text-sm font-medium rounded-md #{params[:range] == 'this_week' || params[:range].nil? ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-50'}" %>
-                <%= link_to "Semana Pasada", root_path(range: "last_week"), class: "px-4 py-2 text-sm font-medium rounded-md #{params[:range] == 'last_week' ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-50'}" %>
-                <%= link_to "Este Mes", root_path(range: "this_month"), class: "px-4 py-2 text-sm font-medium rounded-md #{params[:range] == 'this_month' ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-50'}" %>
-            </div>
         </div>
     </div>
 
-    <!-- Charts Row -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-            <h3 class="text-lg font-semibold text-slate-800 mb-4">Objeciones Recurrentes</h3>
-            <%= bar_chart @filter_scope.group("analysis->>'objection'").count, colors: ["#4f46e5"], height: "200px" %>
-        </div>
-        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-            <h3 class="text-lg font-semibold text-slate-800 mb-4">Temperatura del Cliente</h3>
-            <%= column_chart @filter_scope.group("analysis->>'temperature'").count, colors: ["#f59e0b"], height: "200px" %>
-        </div>
+    <!-- Row 1: AI Analysis -->
+
+
+    <h2 class="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+        <i data-lucide="bar-chart-2" class="w-6 h-6 text-indigo-600"></i>
+        Métricas Comerciales (Real Time)
+    </h2>
+
+    <!-- Row 2: Ventas vs Oportunidades (Monthly Trend) -->
+    <!-- Chart 1: Money ($) -->
+    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-8">
+        <h3 class="text-lg font-semibold text-slate-800 mb-4">Ventas vs Oportunidades (Por mes $)</h3>
+        <%= column_chart [
+            {name: "ventas", data: @monthly_sales},
+            {name: "oportunidades", data: @monthly_ops},
+            {name: "cancelado", data: @monthly_cancelled}
+        ], colors: ["#4ade80", "#3b82f6", "#ef4444"], prefix: "$", stacked: false, round: 2, height: "350px", 
+           library: { 
+             plugins: { 
+               datalabels: { 
+                 display: true, 
+                 anchor: 'end', 
+                 align: 'top', 
+                 color: '#475569', 
+                 font: { weight: 'bold' },
+                 formatter: "(val) => '$' + Math.round(val).toLocaleString()"
+               } 
+             } 
+           } %>
+    </div>
+
+    <!-- Chart 2: Count (#) -->
+    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-8">
+        <h3 class="text-lg font-semibold text-slate-800 mb-4">Ventas vs Oportunidades (Por mes #)</h3>
+        <%= column_chart [
+            {name: "ventas", data: @monthly_sales_count},
+            {name: "oportunidades", data: @monthly_ops_count},
+            {name: "cancelado", data: @monthly_cancelled_count}
+        ], colors: ["#4ade80", "#3b82f6", "#ef4444"], stacked: false, height: "350px", 
+           library: { 
+             plugins: { 
+               datalabels: { 
+                 display: true, 
+                 anchor: 'end', 
+                 align: 'top', 
+                 color: '#475569', 
+                 font: { weight: 'bold' } 
+               } 
+             } 
+           } %>
+    </div>
+
+    <!-- Row 3: Time in Status (Moved Up) -->
+    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-8">
+        <h3 class="text-lg font-semibold text-slate-800 mb-4">Tiempo Promedio en Cada Estado</h3>
+        <p class="text-sm text-slate-500 mb-4">Promedio de tiempo que transcurre antes de cambiar al siguiente estado.</p>
+        <%= bar_chart @avg_time_in_status, colors: ["#4ade80"], height: "300px",
+            library: {
+               plugins: { 
+                 datalabels: { 
+                   color: '#475569', anchor: 'end', align: 'end',
+                   formatter: "(val) => { if(val < 1) { return Math.round(val * 24 * 10) / 10 + ' hours' } else { return val + ' days' } }"
+                 } 
+               }
+            }
+        %>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -91,13 +146,14 @@
     </div>
 
     <!-- Table -->
-    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-        <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col max-h-[600px]">
+        <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center sticky top-0 z-10">
             <h3 class="font-semibold text-slate-800">Últimas Auditorías</h3>
         </div>
         
-        <!-- Turbo Stream Target -->
-        <table class="w-full text-left border-collapse">
+        <div class="overflow-y-auto flex-1">
+            <!-- Turbo Stream Target -->
+            <table class="w-full text-left border-collapse">
             <thead>
                 <tr class="text-xs font-semibold text-slate-500 uppercase tracking-wider border-b border-slate-200 bg-slate-50">
                     <th class="px-6 py-4">ID Chat</th>
@@ -112,6 +168,7 @@
                 <%= render partial: "conversation", collection: @conversations %>
             </tbody>
         </table>
+        </div>
     </div>
 </main>
 

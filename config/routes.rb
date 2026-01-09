@@ -7,6 +7,8 @@ Rails.application.routes.draw do
   end
 
   post "dashboards/analyze", to: "dashboards#analyze", as: :analyze_dashboard
+  
+  resources :bot_failures, only: [:index]
 
   # Dashboard route (Hito 2)
   root "dashboards#index"

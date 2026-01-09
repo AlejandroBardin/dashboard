@@ -1,27 +1,40 @@
-require "net/http"
-
 class AnalyzeConversationsJob < ApplicationJob
   queue_as :default
 
   def perform
-    # Trigger payload
-    payload = {
-      instruction: "Analyze the conversations in your database and send the results back to the Rails webhook"
-    }
+    Rails.logger.info "Starting AI Sync Job (Chatwoot Fetch + OpenAI Analysis)..."
 
-    # Helper to send to n8n
-    n8n_url = Settings.n8n.webhook_url
+    # Quick check for required env vars
+    missing_vars = []
+    missing_vars << 'CHATWOOT_API_TOKEN' unless ENV['CHATWOOT_API_TOKEN']
+    missing_vars << 'CHATWOOT_ACCOUNT_ID' unless ENV['CHATWOOT_ACCOUNT_ID']
+    missing_vars << 'OPENAI_API_KEY' unless ENV['OPENAI_API_KEY']
 
-    uri = URI(n8n_url)
-    http = Net::HTTP.new(uri.host, uri.port)
-    http.use_ssl = (uri.scheme == "https")
-    http.verify_mode = OpenSSL::SSL::VERIFY_NONE # Bypass SSL for development/demo
+    if missing_vars.any?
+      Rails.logger.error "AI Sync Job Aborted. Missing environment variables: #{missing_vars.join(', ')}"
+      return
+    end
 
-    request = Net::HTTP::Post.new(uri.path, "Content-Type" => "application/json")
-    request.body = payload.to_json
+    begin
+      # 1. Fetch last 100 conversations
+      Rails.logger.info "Fetching last 100 conversations from Chatwoot..."
+      fetcher = Chatwoot::Fetcher.new
+      conversations = fetcher.fetch_latest(limit: 100)
 
-    response = http.request(request)
+      if conversations.any?
+        # 2. Analyze using AI
+        Rails.logger.info "Analyzing #{conversations.count} conversations with OpenAI..."
+        analyzer = Chatwoot::AiAnalyzer.new
+        analyzer.analyze(conversations)
+        
+        Rails.logger.info "AI Sync Job Completed successfully. #{conversations.count} conversations processed."
+      else
+        Rails.logger.info "AI Sync Job: No conversations were fetched from Chatwoot."
+      end
 
-    Rails.logger.info "Triggered n8n analysis. Status: #{response.code}"
+    rescue StandardError => e
+      Rails.logger.error "AI Sync Job Failed: #{e.message}"
+      Rails.logger.error e.backtrace.join("\n")
+    end
   end
 end
