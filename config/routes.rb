@@ -2,8 +2,11 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       post "webhooks", to: "webhooks#create"
+      post "ai_responses", to: "ai_responses#create"
     end
   end
+
+  post "dashboards/analyze", to: "dashboards#analyze", as: :analyze_dashboard
 
   # Dashboard route (Hito 2)
   root "dashboards#index"

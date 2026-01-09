@@ -14,8 +14,33 @@
     <!-- Stats Row -->
     <div class="flex justify-between items-end mb-8">
         <div>
-            <h1 class="text-3xl font-bold text-slate-900">Resumen de Ventas</h1>
-            <p class="text-slate-500 mt-1">Análisis de IA sobre conversaciones de WhatsApp</p>
+            <h1 class="text-3xl font-bold text-slate-900">The War Room</h1>
+            <p class="text-slate-500 mt-1">Metricas de auditoría en tiempo real</p>
+        </div>
+        <div class="flex items-center gap-4">
+            <%= button_to analyze_dashboard_path, method: :post, class: "flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm" do %>
+                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                Sync con IA
+            <% end %>
+            
+            <div class="flex bg-white rounded-lg p-1 border border-slate-200 shadow-sm">
+                <%= link_to "Hoy", root_path(range: "today"), class: "px-4 py-2 text-sm font-medium rounded-md #{params[:range] == 'today' ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-50'}" %>
+                <%= link_to "Esta Semana", root_path(range: "this_week"), class: "px-4 py-2 text-sm font-medium rounded-md #{params[:range] == 'this_week' || params[:range].nil? ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-50'}" %>
+                <%= link_to "Semana Pasada", root_path(range: "last_week"), class: "px-4 py-2 text-sm font-medium rounded-md #{params[:range] == 'last_week' ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-50'}" %>
+                <%= link_to "Este Mes", root_path(range: "this_month"), class: "px-4 py-2 text-sm font-medium rounded-md #{params[:range] == 'this_month' ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-50'}" %>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+            <h3 class="text-lg font-semibold text-slate-800 mb-4">Objeciones Recurrentes</h3>
+            <%= bar_chart @filter_scope.group("analysis->>'objection'").count, colors: ["#4f46e5"], height: "200px" %>
+        </div>
+        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+            <h3 class="text-lg font-semibold text-slate-800 mb-4">Temperatura del Cliente</h3>
+            <%= column_chart @filter_scope.group("analysis->>'temperature'").count, colors: ["#f59e0b"], height: "200px" %>
         </div>
     </div>
 
