@@ -55,3 +55,6 @@ end
 gem "tailwindcss-rails", "~> 4.4"
 
 gem "propshaft", "~> 1.3"
+
+gem "chartkick"
+gem "groupdate"
