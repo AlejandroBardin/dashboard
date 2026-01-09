@@ -135,7 +135,9 @@ class DashboardsController < ApplicationController
     # We will use find_by_sql for exact replication of the logic.
 
     # Enforce 4 month window to get meaningful averages, as "This Month" might be too short for status changes.
-    time_filter = "AND changed_at BETWEEN '#{3.months.ago.beginning_of_month}' AND '#{Time.current.end_of_month}'"
+    # Enforce 4 month window to get meaningful averages
+    start_date = 3.months.ago.beginning_of_month
+    end_date = Time.current.end_of_month
 
     time_in_status_sql = <<~SQL
       WITH ordered AS (
@@ -147,7 +149,7 @@ class DashboardsController < ApplicationController
                   PARTITION BY sale_id ORDER BY changed_at
               ) AS next_changed_at
           FROM sale_status_histories
-          WHERE 1=1 #{time_filter}
+          WHERE 1=1 AND changed_at BETWEEN :start_date AND :end_date
       ),
       durations AS (
           SELECT
@@ -163,7 +165,9 @@ class DashboardsController < ApplicationController
       GROUP BY status
     SQL
 
-    @avg_time_in_status_raw = Ecommerce::SaleStatusHistory.connection.select_all(time_in_status_sql).rows
+    @avg_time_in_status_raw = Ecommerce::SaleStatusHistory.connection.select_all(
+      Ecommerce::SaleStatusHistory.sanitize_sql_array([ time_in_status_sql, { start_date: start_date, end_date: end_date } ])
+    ).rows
 
     # Map raw results to chart format with Dynamic Units (Hours vs Days)
     # But Chartkick expects a single number for the bar length.

@@ -1,0 +1,29 @@
+{
+  "ignored_warnings": [
+    {
+      "warning_type": "SSL Verification Bypass",
+      "warning_code": 71,
+      "fingerprint": "39c639c958924010fff8d0c4c4acf5811136cd4c8a106dd673340c69bf80814a",
+      "check_name": "SSLVerify",
+      "message": "SSL certificate verification was bypassed",
+      "file": "app/services/chatwoot/fetcher.rb",
+      "line": 90,
+      "link": "https://brakemanscanner.org/docs/warning_types/ssl_verification_bypass/",
+      "code": "Net::HTTP.new(url.host, url.port).verify_mode = OpenSSL::SSL::VERIFY_NONE",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Chatwoot::Fetcher",
+        "method": "make_request"
+      },
+      "user_input": null,
+      "confidence": "High",
+      "cwe_id": [
+        295
+      ],
+      "note": "Intentionally bypassed for Chatwoot self-hosted instance with self-signed certificate."
+    }
+  ],
+  "updated": "2026-01-09 05:00:00 -0000",
+  "brakeman_version": "7.1.2"
+}
