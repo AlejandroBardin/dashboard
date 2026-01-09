@@ -13,4 +13,8 @@ export PORT="${PORT:-3000}"
 export RUBY_DEBUG_OPEN="true"
 export RUBY_DEBUG_LAZY="true"
 
-exec foreman start -f Procfile.dev "$@"
+if command -v overmind > /dev/null; then
+  exec overmind start -f Procfile.dev "$@"
+else
+  exec foreman start -f Procfile.dev "$@"
+fi
