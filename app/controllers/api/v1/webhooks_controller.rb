@@ -4,7 +4,7 @@ module Api
       skip_before_action :verify_authenticity_token
 
       def create
-        payload = params.require(:webhook).permit!
+        payload = params.require(:webhook).to_unsafe_h
         external_id = payload[:id] || payload[:conversation_id]
 
         conversation = Conversation.find_or_initialize_by(external_id: external_id)
