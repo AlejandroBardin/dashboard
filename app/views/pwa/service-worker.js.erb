@@ -1,0 +1,9 @@
+// app/views/pwa/service-worker.js.erb
+// Empty service worker for now, or basic cache
+self.addEventListener("install", (event) => {
+  console.log("Service Worker installed");
+});
+
+self.addEventListener("fetch", (event) => {
+  // basic fetch pass-through
+});
