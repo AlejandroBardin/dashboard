@@ -23,10 +23,7 @@
                 Sync con IA
             <% end %>
 
-            <%= link_to bot_failures_path, class: "flex items-center gap-2 bg-red-100 hover:bg-red-200 text-red-700 px-4 py-2 rounded-lg font-medium transition-colors border border-red-200" do %>
-                <i data-lucide="skull" class="w-4 h-4"></i>
-                Hall of Shame
-            <% end %>
+
             
         </div>
     </div>
@@ -34,80 +31,17 @@
     <!-- Row 1: AI Analysis -->
 
 
-    <h2 class="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
-        <i data-lucide="bar-chart-2" class="w-6 h-6 text-indigo-600"></i>
-        Métricas Comerciales (Real Time)
-    </h2>
 
-    <!-- Row 2: Ventas vs Oportunidades (Monthly Trend) -->
-    <!-- Chart 1: Money ($) -->
-    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-8">
-        <h3 class="text-lg font-semibold text-slate-800 mb-4">Ventas vs Oportunidades (Por mes $)</h3>
-        <%= column_chart [
-            {name: "ventas", data: @monthly_sales},
-            {name: "oportunidades", data: @monthly_ops},
-            {name: "cancelado", data: @monthly_cancelled}
-        ], colors: ["#4ade80", "#3b82f6", "#ef4444"], prefix: "$", stacked: false, round: 2, height: "350px", 
-           library: { 
-             plugins: { 
-               datalabels: { 
-                 display: true, 
-                 anchor: 'end', 
-                 align: 'top', 
-                 color: '#475569', 
-                 font: { weight: 'bold' },
-                 formatter: "(val) => '$' + Math.round(val).toLocaleString()"
-               } 
-             } 
-           } %>
-    </div>
 
-    <!-- Chart 2: Count (#) -->
-    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-8">
-        <h3 class="text-lg font-semibold text-slate-800 mb-4">Ventas vs Oportunidades (Por mes #)</h3>
-        <%= column_chart [
-            {name: "ventas", data: @monthly_sales_count},
-            {name: "oportunidades", data: @monthly_ops_count},
-            {name: "cancelado", data: @monthly_cancelled_count}
-        ], colors: ["#4ade80", "#3b82f6", "#ef4444"], stacked: false, height: "350px", 
-           library: { 
-             plugins: { 
-               datalabels: { 
-                 display: true, 
-                 anchor: 'end', 
-                 align: 'top', 
-                 color: '#475569', 
-                 font: { weight: 'bold' } 
-               } 
-             } 
-           } %>
-    </div>
-
-    <!-- Row 3: Time in Status (Moved Up) -->
-    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-8">
-        <h3 class="text-lg font-semibold text-slate-800 mb-4">Tiempo Promedio en Cada Estado</h3>
-        <p class="text-sm text-slate-500 mb-4">Promedio de tiempo que transcurre antes de cambiar al siguiente estado.</p>
-        <%= bar_chart @avg_time_in_status, colors: ["#4ade80"], height: "300px",
-            library: {
-               plugins: { 
-                 datalabels: { 
-                   color: '#475569', anchor: 'end', align: 'end',
-                   formatter: "(val) => { if(val < 1) { return Math.round(val * 24 * 10) / 10 + ' hours' } else { return val + ' days' } }"
-                 } 
-               }
-            }
-        %>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <!-- Potencial -->
         <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
             <div class="flex justify-between items-start">
                 <div>
-                    <p class="text-sm font-medium text-slate-500">Monto Potencial</p>
-                    <h3 class="text-2xl font-bold mt-1 text-slate-900"><%= number_to_currency(@total_potential, unit: "$", precision: 0) %></h3>
+                    <p class="text-sm font-medium text-slate-500">Oportunidades Abiertas</p>
+                    <h3 class="text-2xl font-bold mt-1 text-slate-900"><%= @total_potential %></h3>
                 </div>
-                <div class="p-2 bg-blue-50 text-blue-600 rounded-lg"><i data-lucide="dollar-sign"></i></div>
+                <div class="p-2 bg-blue-50 text-blue-600 rounded-lg"><i data-lucide="message-circle"></i></div>
             </div>
         </div>
 
@@ -115,8 +49,8 @@
         <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
             <div class="flex justify-between items-start">
                 <div>
-                    <p class="text-sm font-medium text-slate-500">Ventas Cerradas</p>
-                    <h3 class="text-2xl font-bold mt-1 text-emerald-600"><%= number_to_currency(@sales_closed, unit: "$", precision: 0) %></h3>
+                    <p class="text-sm font-medium text-slate-500">Conversaciones Exitosas</p>
+                    <h3 class="text-2xl font-bold mt-1 text-emerald-600"><%= @sales_closed %></h3>
                 </div>
                 <div class="p-2 bg-emerald-50 text-emerald-600 rounded-lg"><i data-lucide="check-circle"></i></div>
             </div>
@@ -127,23 +61,120 @@
             <div class="flex justify-between items-start">
                 <div>
                     <p class="text-sm font-medium text-slate-500">Ventas Caídas</p>
-                    <h3 class="text-2xl font-bold mt-1 text-rose-600"><%= number_to_currency(@sales_lost, unit: "$", precision: 0) %></h3>
+                    <h3 class="text-2xl font-bold mt-1 text-rose-600"><%= @sales_lost %></h3>
                 </div>
                 <div class="p-2 bg-rose-50 text-rose-600 rounded-lg"><i data-lucide="x-circle"></i></div>
             </div>
         </div>
         
         <!-- Fallas Bot -->
-        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-            <div class="flex justify-between items-start">
-                <div>
-                    <p class="text-sm font-medium text-slate-500">Fallas del Bot</p>
-                    <h3 class="text-2xl font-bold mt-1 text-amber-600"><%= @bot_failures %></h3>
+        <%= link_to bot_failures_path, class: "group block" do %>
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm transition-all hover:border-amber-300 hover:shadow-md cursor-pointer group-hover:bg-amber-50/30">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-sm font-medium text-slate-500 group-hover:text-amber-700">Fallas del Bot</p>
+                        <h3 class="text-2xl font-bold mt-1 text-amber-600"><%= @bot_failures %></h3>
+                    </div>
+                    <div class="p-2 bg-amber-50 text-amber-600 rounded-lg group-hover:bg-amber-100"><i data-lucide="bot"></i></div>
                 </div>
-                <div class="p-2 bg-amber-50 text-amber-600 rounded-lg"><i data-lucide="bot"></i></div>
+            </div>
+        <% end %>
+
+        <!-- Fallas Tiempo -->
+        <%= link_to delivery_failures_path, class: "group block" do %>
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm transition-all hover:border-orange-300 hover:shadow-md cursor-pointer group-hover:bg-orange-50/30">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-sm font-medium text-slate-500 group-hover:text-orange-700">Fallas Tiempo</p>
+                        <h3 class="text-2xl font-bold mt-1 text-orange-600"><%= @delivery_failures %></h3>
+                    </div>
+                    <div class="p-2 bg-orange-50 text-orange-600 rounded-lg group-hover:bg-orange-100"><i data-lucide="timer-off"></i></div>
+                </div>
+            </div>
+        <% end %>
+        
+        <!-- Fallas Diseño -->
+        <%= link_to design_failures_path, class: "group block" do %>
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm transition-all hover:border-pink-300 hover:shadow-md cursor-pointer group-hover:bg-pink-50/30">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-sm font-medium text-slate-500 group-hover:text-pink-700">Fallas Diseño</p>
+                        <h3 class="text-2xl font-bold mt-1 text-pink-600"><%= @design_failures %></h3>
+                    </div>
+                    <div class="p-2 bg-pink-50 text-pink-600 rounded-lg group-hover:bg-pink-100"><i data-lucide="palette"></i></div>
+                </div>
+            </div>
+        <% end %>
+    </div>
+
+    <!-- Fault Responsibility Analysis -->
+    <div class="mt-8 mb-8">
+        <h2 class="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+            <i data-lucide="alert-octagon" class="w-6 h-6 text-red-600"></i>
+            Análisis de Responsabilidad de Falla
+        </h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Donut Chart: Who is to blame? -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm md:col-span-1">
+                <h3 class="text-lg font-semibold text-slate-800 mb-4">Responsable de Falla</h3>
+                <%= pie_chart @fault_distribution, donut: true, colors: ["#f59e0b", "#ef4444", "#3b82f6", "#10b981"], legend: "bottom", height: "300px" %>
+            </div>
+
+            <!-- Explanations -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm md:col-span-2 flex flex-col justify-center">
+                <h3 class="text-lg font-semibold text-slate-800 mb-4">Criterios de Atribución</h3>
+                <div class="space-y-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-3 h-3 rounded-full bg-amber-500 mt-1.5 flex-shrink-0"></div>
+                        <div>
+                            <p class="font-medium text-slate-900">Falla Bot (Tecnología)</p>
+                            <p class="text-sm text-slate-500">Cuando el bot entra en bucle, no entiende el contexto o bloquea la conversación (Rating < 6 + Bloqueo).</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start gap-3">
+                        <div class="w-3 h-3 rounded-full bg-red-500 mt-1.5 flex-shrink-0"></div>
+                        <div>
+                            <p class="font-medium text-slate-900">Falla Operador (Humano)</p>
+                            <p class="text-sm text-slate-500">El bot hizo su trabajo, pero el humano tardó en responder o no hizo seguimiento oportuno.</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3">
+                        <div class="w-3 h-3 rounded-full bg-blue-500 mt-1.5 flex-shrink-0"></div>
+                        <div>
+                            <p class="font-medium text-slate-900">Falla Modelo (Oferta)</p>
+                            <p class="text-sm text-slate-500">Atención correcta, pero el cliente necesitaba algo que no ofrecimos (ej: diseño complejo) y se perdió la venta.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+
+    <!-- Global Auditor Diagnosis -->
+    <% if @global_audit.present? %>
+        <div class="mt-8 mb-8">
+            <div class="bg-white rounded-xl shadow-sm border border-indigo-100 overflow-hidden">
+                <div class="bg-indigo-50/50 px-8 py-6 border-b border-indigo-100 flex items-center gap-3">
+                    <div class="p-2 bg-indigo-100/50 rounded-lg">
+                        <i data-lucide="sparkles" class="w-6 h-6 text-indigo-600"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-bold text-indigo-900">Conclusión del Auditor</h2>
+                        <p class="text-sm text-indigo-600/80">Diagnóstico IA basado en las últimas 100 conversaciones</p>
+                    </div>
+                </div>
+
+                <div class="p-8">
+                    <div class="prose prose-indigo max-w-none text-slate-700 leading-relaxed">
+                        <%= raw @global_audit %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <% end %>
 
     <!-- Table -->
     <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col max-h-[600px]">
@@ -170,6 +201,77 @@
         </table>
         </div>
     </div>
+
+
+
+    <!-- Commercial Metrics (Moved to Bottom) -->
+    <div class="mt-12 border-t border-slate-200 pt-8">
+        <h2 class="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+            <i data-lucide="bar-chart-2" class="w-6 h-6 text-indigo-600"></i>
+            Métricas Comerciales (Real Time)
+        </h2>
+
+        <!-- Chart 1: Money ($) -->
+        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-8">
+            <h3 class="text-lg font-semibold text-slate-800 mb-4">Ventas vs Oportunidades (Por mes $)</h3>
+            <%= column_chart [
+                {name: "ventas", data: @monthly_sales},
+                {name: "oportunidades", data: @monthly_ops},
+                {name: "cancelado", data: @monthly_cancelled}
+            ], colors: ["#4ade80", "#3b82f6", "#ef4444"], prefix: "$", stacked: false, round: 2, height: "350px", 
+               library: { 
+                 plugins: { 
+                   datalabels: { 
+                     display: true, 
+                     anchor: 'end', 
+                     align: 'top', 
+                     color: '#475569', 
+                     font: { weight: 'bold' },
+                     formatter: "(val) => '$' + Math.round(val).toLocaleString()"
+                   } 
+                 } 
+               } %>
+        </div>
+
+        <!-- Chart 2: Count (#) -->
+        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-8">
+            <h3 class="text-lg font-semibold text-slate-800 mb-4">Ventas vs Oportunidades (Por mes #)</h3>
+            <%= column_chart [
+                {name: "ventas", data: @monthly_sales_count},
+                {name: "oportunidades", data: @monthly_ops_count},
+                {name: "cancelado", data: @monthly_cancelled_count}
+            ], colors: ["#4ade80", "#3b82f6", "#ef4444"], stacked: false, height: "350px", 
+               library: { 
+                 plugins: { 
+                   datalabels: { 
+                     display: true, 
+                     anchor: 'end', 
+                     align: 'top', 
+                     color: '#475569', 
+                     font: { weight: 'bold' } 
+                   } 
+                 } 
+               } %>
+        </div>
+
+        <!-- Chart 3: Time in Status -->
+        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-8">
+            <h3 class="text-lg font-semibold text-slate-800 mb-4">Tiempo Promedio en Cada Estado</h3>
+            <p class="text-sm text-slate-500 mb-4">Promedio de tiempo que transcurre antes de cambiar al siguiente estado.</p>
+            <%= bar_chart @avg_time_in_status, colors: ["#4ade80"], height: "300px",
+                library: {
+                   plugins: { 
+                     datalabels: { 
+                       color: '#475569', anchor: 'end', align: 'end',
+                       formatter: "(val) => { if(val < 1) { return Math.round(val * 24 * 10) / 10 + ' hours' } else { return val + ' days' } }"
+                     } 
+                   }
+                }
+            %>
+        </div>
+    </div>
+
+
 </main>
 
 <script>

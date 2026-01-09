@@ -63,3 +63,5 @@ gem "config"
 gem "turbo-rails"
 
 gem "ruby-openai", "~> 8.3"
+
+gem "dotenv-rails", "~> 3.2"

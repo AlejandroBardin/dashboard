@@ -156,6 +156,12 @@ module Chatwoot
                 "timing": boolean,
                 "bot_error": boolean
              }
+          },
+          "post_sales_analysis": {
+             "is_post_sale": boolean,
+             "delivery_status": "on_time" | "delayed" | "unknown",
+             "complaint_type": "none" | "delay" | "quality" | "wrong_item",
+             "customer_anger": boolean
           }
         }
 

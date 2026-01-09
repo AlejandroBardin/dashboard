@@ -104,6 +104,9 @@ GEM
       reline (>= 0.3.8)
     deep_merge (1.2.2)
     dotenv (3.2.0)
+    dotenv-rails (3.2.0)
+      dotenv (= 3.2.0)
+      railties (>= 6.1)
     drb (2.2.3)
     ed25519 (1.4.0)
     erb (6.0.1)
@@ -403,6 +406,7 @@ DEPENDENCIES
   chartkick
   config
   debug
+  dotenv-rails (~> 3.2)
   groupdate
   image_processing (~> 1.2)
   kamal

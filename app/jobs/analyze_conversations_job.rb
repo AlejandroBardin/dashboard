@@ -26,6 +26,10 @@ class AnalyzeConversationsJob < ApplicationJob
         Rails.logger.info "Analyzing #{conversations.count} conversations with OpenAI..."
         analyzer = Chatwoot::AiAnalyzer.new
         analyzer.analyze(conversations)
+
+        # 3. Global Auditor Diagnosis
+        Rails.logger.info "Running Global Auditor Diagnosis..."
+        Chatwoot::GlobalAuditor.run
         
         Rails.logger.info "AI Sync Job Completed successfully. #{conversations.count} conversations processed."
       else

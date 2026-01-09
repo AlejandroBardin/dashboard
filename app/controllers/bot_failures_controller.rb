@@ -1,8 +1,8 @@
 class BotFailuresController < ApplicationController
   def index
-    # Only show conversations flagged as bot failures
-    # We eager load messages if we want to show chat history, 
-    # but for now we rely on the conversation data and analysis.
-    @failures = Conversation.bot_failure.order(created_at: :desc).limit(50)
+    # Only show conversations flagged as bot failures (Rating <= 4 OR Dead Ends)
+    @failures = Conversation.where("(analysis -> 'bot_audit' ->> 'rating')::int <= 4 OR (analysis -> 'bot_audit' -> 'friction_points' ->> 'dead_ends')::boolean = true")
+                            .order(created_at: :desc)
+                            .limit(50)
   end
 end
