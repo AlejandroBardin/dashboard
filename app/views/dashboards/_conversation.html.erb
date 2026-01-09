@@ -1,0 +1,25 @@
+<tr id="<%= dom_id(conversation) %>" class="hover:bg-slate-50 transition">
+    <td class="px-6 py-4 font-mono text-slate-600">#<%= conversation.external_id %></td>
+    <td class="px-6 py-4">
+        <% 
+           status_classes = case conversation.status
+             when 'sold' then 'bg-green-100 text-green-800'
+             when 'dropped' then 'bg-red-100 text-red-800'
+             when 'bot_failure' then 'bg-amber-100 text-amber-800'
+             else 'bg-slate-100 text-slate-800'
+           end
+        %>
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= status_classes %>">
+            <%= conversation.status.humanize %>
+        </span>
+    </td>
+    <td class="px-6 py-4 font-medium text-slate-800">
+        <%= number_to_currency(conversation.potential_amount, unit: "$", precision: 0) %>
+    </td>
+    <td class="px-6 py-4 text-slate-600">
+        <%= conversation.raw_data.dig('analysis', 'summary') || "Pendiente de análisis..." %>
+    </td>
+    <td class="px-6 py-4">
+        <a href="#" class="text-indigo-600 hover:text-indigo-900 font-medium">Ver Chat &rarr;</a>
+    </td>
+</tr>

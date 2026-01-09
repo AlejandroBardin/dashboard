@@ -1,0 +1,17 @@
+PreCommit:
+  RuboCop:
+    enabled: true
+    on_warn: fail # Treat warnings as failures
+    problem_on_unmodified_line: ignore # Only check modified lines
+    command: ['bundle', 'exec', 'rubocop']
+
+PrePush:
+  Brakeman:
+    enabled: true
+    command: ['bundle', 'exec', 'brakeman']
+  
+CommitMsg:
+  CapitalizedSubject:
+    enabled: true
+  EmptyMessage:
+    enabled: true

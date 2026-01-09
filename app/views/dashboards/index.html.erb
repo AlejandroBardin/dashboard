@@ -1,0 +1,98 @@
+<!-- This view uses the standard application layout but includes the specific dashboard structure -->
+<nav class="bg-white border-b border-slate-200 h-16 flex items-center px-8 justify-between sticky top-0 z-10">
+    <div class="flex items-center gap-2">
+        <div class="bg-indigo-600 text-white p-1.5 rounded-lg font-bold text-xl">LG</div>
+        <span class="font-semibold text-lg tracking-tight">Audit System</span>
+    </div>
+    <div class="flex items-center gap-4">
+        <span class="text-sm text-slate-500">Última sync: <span data-controller="timeago" data-timeago-datetime-value="<%= Time.current.iso8601 %>">Hace un momento</span></span>
+        <div class="h-8 w-8 bg-slate-200 rounded-full flex items-center justify-center text-slate-600 font-bold">A</div>
+    </div>
+</nav>
+
+<main class="max-w-7xl mx-auto p-8">
+    <!-- Stats Row -->
+    <div class="flex justify-between items-end mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-slate-900">Resumen de Ventas</h1>
+            <p class="text-slate-500 mt-1">Análisis de IA sobre conversaciones de WhatsApp</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <!-- Potencial -->
+        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-sm font-medium text-slate-500">Monto Potencial</p>
+                    <h3 class="text-2xl font-bold mt-1 text-slate-900"><%= number_to_currency(@total_potential, unit: "$", precision: 0) %></h3>
+                </div>
+                <div class="p-2 bg-blue-50 text-blue-600 rounded-lg"><i data-lucide="dollar-sign"></i></div>
+            </div>
+        </div>
+
+        <!-- Cerradas -->
+        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-sm font-medium text-slate-500">Ventas Cerradas</p>
+                    <h3 class="text-2xl font-bold mt-1 text-emerald-600"><%= number_to_currency(@sales_closed, unit: "$", precision: 0) %></h3>
+                </div>
+                <div class="p-2 bg-emerald-50 text-emerald-600 rounded-lg"><i data-lucide="check-circle"></i></div>
+            </div>
+        </div>
+
+        <!-- Caídas -->
+        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-sm font-medium text-slate-500">Ventas Caídas</p>
+                    <h3 class="text-2xl font-bold mt-1 text-rose-600"><%= number_to_currency(@sales_lost, unit: "$", precision: 0) %></h3>
+                </div>
+                <div class="p-2 bg-rose-50 text-rose-600 rounded-lg"><i data-lucide="x-circle"></i></div>
+            </div>
+        </div>
+        
+        <!-- Fallas Bot -->
+        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-sm font-medium text-slate-500">Fallas del Bot</p>
+                    <h3 class="text-2xl font-bold mt-1 text-amber-600"><%= @bot_failures %></h3>
+                </div>
+                <div class="p-2 bg-amber-50 text-amber-600 rounded-lg"><i data-lucide="bot"></i></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+            <h3 class="font-semibold text-slate-800">Últimas Auditorías</h3>
+        </div>
+        
+        <!-- Turbo Stream Target -->
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="text-xs font-semibold text-slate-500 uppercase tracking-wider border-b border-slate-200 bg-slate-50">
+                    <th class="px-6 py-4">ID Chat</th>
+                    <th class="px-6 py-4">Estado</th>
+                    <th class="px-6 py-4">Monto Est.</th>
+                    <th class="px-6 py-4">Diagnóstico IA</th>
+                    <th class="px-6 py-4">Acción</th>
+                </tr>
+            </thead>
+            <tbody id="conversations_list" class="divide-y divide-slate-100 text-sm">
+                <!-- Render existing conversations -->
+                <%= render partial: "conversation", collection: @conversations %>
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<script>
+    // Initialize Lucide icons
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+</script>
